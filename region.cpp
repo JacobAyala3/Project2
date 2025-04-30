@@ -1,8 +1,7 @@
 #include "region.h"
+#include <iostream>
 #include <fstream>
 #include <sstream>
-#include <iostream>
-#include <algorithm> // Needed for remove_if and isspace
 
 using namespace std;
 
@@ -11,39 +10,84 @@ bool Region::loadRegion(const string& filename) {
     if (!file.is_open()) return false;
 
     string line;
+    grid.clear();
     while (getline(file, line)) {
+        vector<char> row;
         stringstream ss(line);
-        vector<Cell> row;
-        string cellValue;
-        while (getline(ss, cellValue, ',')) {
-            cellValue.erase(remove_if(cellValue.begin(), cellValue.end(), ::isspace), cellValue.end());
-            Cell c;
-            c.type = cellValue.empty() ? '-' : cellValue[0];
-            row.push_back(c);
+        string cell;
+        while (getline(ss, cell, ',')) {
+            row.push_back(cell.empty() ? '-' : cell[0]);
         }
         grid.push_back(row);
     }
 
+    height = grid.size();
+    width = height > 0 ? grid[0].size() : 0;
     return true;
 }
 
-void Region::displayRegion() const {
+void Region::displayRegion() {
     for (const auto& row : grid) {
-        for (const auto& cell : row) {
-            if ((cell.type == 'R' || cell.type == 'C' || cell.type == 'I') && cell.population > 0) {
-                cout << cell.population;
-            } else {
-                cout << cell.type;
-            }
+        for (char c : row) {
+            cout << c;
         }
         cout << endl;
     }
 }
 
-int Region::getWidth() const {
-    return grid.empty() ? 0 : grid[0].size();
+void Region::growResidential(bool slowed) {
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            if (grid[y][x] == 'R') {
+                int growChance = slowed ? 10 : 30; // 10% if slowed, 30% otherwise
+                if (rand() % 100 < growChance) {
+                    if (x + 1 < width && grid[y][x + 1] == '-') grid[y][x + 1] = 'R';
+                }
+            }
+        }
+    }
 }
 
-int Region::getHeight() const {
-    return grid.size();
+void Region::growCommercial(bool slowed) {
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            if (grid[y][x] == 'C') {
+                int growChance = slowed ? 5 : 20;
+                if (rand() % 100 < growChance) {
+                    if (x + 1 < width && grid[y][x + 1] == '-') grid[y][x + 1] = 'C';
+                }
+            }
+        }
+    }
+}
+
+void Region::growIndustrial(bool slowed) {
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            if (grid[y][x] == 'I') {
+                int growChance = slowed ? 5 : 20;
+                if (rand() % 100 < growChance) {
+                    if (x + 1 < width && grid[y][x + 1] == '-') grid[y][x + 1] = 'I';
+                }
+            }
+        }
+    }
+}
+
+bool Region::noChangeDetected() {
+    // Simple placeholder: always simulate full steps
+    return false;
+}
+
+void Region::setCell(int x, int y, char value) {
+    if (y >= 0 && y < height && x >= 0 && x < width) {
+        grid[y][x] = value;
+    }
+}
+
+char Region::getCell(int x, int y) const {
+    if (y >= 0 && y < height && x >= 0 && x < width) {
+        return grid[y][x];
+    }
+    return '-';
 }
