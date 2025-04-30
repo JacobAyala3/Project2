@@ -46,4 +46,9 @@ void runSimulation(Region& region, int maxTimeSteps, int refreshRate) {
 
     cout << "\nFinal region state after simulation:" << endl;
     region.displayRegion();
+    cout << "\nFinal region state after simulation:" << endl;
+    region.displayRegion();
+
+    cout << "\nTotal regional pollution: " << region.calculateTotalPollution() << endl;
+
 }

@@ -23,6 +23,9 @@ public:
     int getWidth() const { return width; }
     void setCell(int x, int y, char value);
     char getCell(int x, int y) const;
+
+    int calculateTotalPollution() const;
+    int calculatePollutionInArea(int x1, int y1, int x2, int y2) const;
 };
 
 #endif

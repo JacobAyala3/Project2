@@ -39,7 +39,7 @@ void Region::growResidential(bool slowed) {
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             if (grid[y][x] == 'R') {
-                int growChance = slowed ? 10 : 30; // 10% if slowed, 30% otherwise
+                int growChance = slowed ? 10 : 30;
                 if (rand() % 100 < growChance) {
                     if (x + 1 < width && grid[y][x + 1] == '-') grid[y][x + 1] = 'R';
                 }
@@ -75,7 +75,7 @@ void Region::growIndustrial(bool slowed) {
 }
 
 bool Region::noChangeDetected() {
-    // Simple placeholder: always simulate full steps
+    //placeholder
     return false;
 }
 
@@ -90,4 +90,30 @@ char Region::getCell(int x, int y) const {
         return grid[y][x];
     }
     return '-';
+}
+
+int Region::calculateTotalPollution() const {
+    int total = 0;
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            char cell = grid[y][x];
+            if (cell == 'I') total += 2;
+            else if (cell == 'R' || cell == 'C') total += 1;
+        }
+    }
+    return total;
+}
+
+int Region::calculatePollutionInArea(int x1, int y1, int x2, int y2) const {
+    int pollution = 0;
+    for (int y = y1; y <= y2; ++y) {
+        for (int x = x1; x <= x2; ++x) {
+            if (y >= 0 && y < height && x >= 0 && x < width) {
+                char cell = grid[y][x];
+                if (cell == 'I') pollution += 2;
+                else if (cell == 'R' || cell == 'C') pollution += 1;
+            }
+        }
+    }
+    return pollution;
 }
